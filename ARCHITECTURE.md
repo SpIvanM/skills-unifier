@@ -38,15 +38,9 @@
 ├── scripts/
 │   ├── SkillsUnifier.psm1
 │   ├── install-skills.ps1
-│   ├── rollback-skills.ps1
-│   └── poc/
-│       ├── SkillsUnifier.Poc.psm1
-│       ├── install-skills-poc.ps1
-│       └── rollback-skills-poc.ps1
+│   └── rollback-skills.ps1
 ├── private/  # local-only wrappers, ignored by git
 └── tests/
-    ├── poc/
-    │   └── SkillsUnifier.Poc.Tests.ps1
     └── final/
         └── SkillsUnifier.Final.Tests.ps1
 ```
@@ -131,7 +125,7 @@ Marker-файл фиксирует:
 
 ## Тестовый контур
 
-Перед реальными каталогами нужен PoC на безопасных папках:
+Перед реальными каталогами нужна проверка на безопасных тестовых папках:
 
 - тестовая установка;
 - повторный запуск;
@@ -141,6 +135,5 @@ Marker-файл фиксирует:
 
 ## Что уже сделано
 
-- PoC-скрипты собраны и проверены.
 - Финальные скрипты собраны и проверены.
 - Локальные wrappers с персональным source path вынесены в `private/`, который игнорируется git.
