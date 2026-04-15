@@ -1,9 +1,35 @@
 # Skills Unifier
 
-Централизованное управление папкой `skills` для нескольких AI-инструментов на Windows.
-Centralized management of the `skills` folder for multiple AI tools on Windows.
+Centralized management of `skills` for multiple AI tools on Windows.
+Централизованное управление `skills` для нескольких AI-инструментов на Windows.
 
-## Русская версия
+[Русская версия](#русская-версия) | [English version](#english-version)
+
+## At a glance
+
+- One source of truth via `SourcePath`.
+- Allowlist-only targeting from [config/known-locations.psd1](config/known-locations.psd1).
+- `skills` is replaced with a `Junction`.
+- Local data is preserved in `skills-backup`.
+- Re-running the scripts is safe.
+- Final validation uses Pester.
+
+## Platform support / Поддержка платформ
+
+Windows 10/11 is the only supported runtime. macOS and Linux are documentation-only.
+Windows 10/11 - единственная поддерживаемая среда выполнения. macOS и Linux - только для чтения документации.
+
+| OS | Status | Installation and use |
+| --- | --- | --- |
+| Windows 10/11 | Supported | Install PowerShell 5.1 or PowerShell 7, then use the commands in the sections below. |
+| macOS | Not supported | You can clone the repository and read the docs, but the automation does not run here. |
+| Linux | Not supported | You can clone the repository and read the docs, but the automation does not run here. |
+
+The scripts rely on Windows paths and NTFS `Junction`, so there is no safe cross-platform install path.
+Скрипты завязаны на Windows-пути и NTFS `Junction`, поэтому безопасного кроссплатформенного сценария установки нет.
+
+<details open>
+<summary>Русская версия</summary>
 
 ### Что входит
 - [scripts/SkillsUnifier.psm1](scripts/SkillsUnifier.psm1) - общая логика установки и rollback.
@@ -13,50 +39,17 @@ Centralized management of the `skills` folder for multiple AI tools on Windows.
 - [private/](private/) - локальные обертки, которые не публикуются в GitHub.
 - [tests/final/SkillsUnifier.Final.Tests.ps1](tests/final/SkillsUnifier.Final.Tests.ps1) - финальные тесты.
 
-### Проблема
-У каждого AI-agent инструмента свой путь к `skills`. В итоге:
-
-- обновления приходится делать вручную в нескольких местах;
-- источники быстро расходятся по версиям;
-- сложно понять, где лежит актуальная копия;
-- откат становится рискованным.
-
-### Решение
-Скрипты проекта:
-
-- работают только по заранее известным и разрешенным путям;
-- сохраняют локальную папку `skills` в `skills-backup`;
-- создают `Junction` на единый источник;
-- безопасно повторяются;
-- умеют откатывать изменения назад;
-- поддерживают snapshot-режим, если `skills-backup` уже занят.
-
-### Запуск
-
-#### Универсальная установка
+### Быстрый старт
 ```powershell
 .\scripts\install-skills.ps1 -SourcePath 'C:\Path\To\skills'
-```
-
-#### Установка с альтернативным списком мест
-```powershell
-.\scripts\install-skills.ps1 -SourcePath 'C:\Path\To\skills' -KnownLocationsPath 'C:\Path\To\known-locations.psd1'
-```
-
-#### Откат
-```powershell
 .\scripts\rollback-skills.ps1
+Invoke-Pester -Path .\tests\final\SkillsUnifier.Final.Tests.ps1 -EnableExit
 ```
 
-#### Откат с удалением backup
-```powershell
-.\scripts\rollback-skills.ps1 -RemoveBackup
-```
-
-#### Локальная обертка
-Если нужен локальный wrapper с жестко заданным source path, храните его в `private/` и запускайте оттуда.
-
-Оба скрипта поддерживают `-WhatIf` и `-Confirm`.
+### Полезные параметры
+- `-KnownLocationsPath` - альтернативный список разрешенных мест.
+- `-RemoveBackup` - удалить backup после отката.
+- `-WhatIf` и `-Confirm` - поддерживаются обоими скриптами.
 
 ### Поддерживаемые места
 Скрипты работают только по allowlist из [config/known-locations.psd1](config/known-locations.psd1):
@@ -76,19 +69,15 @@ Centralized management of the `skills` folder for multiple AI tools on Windows.
 - Rollback восстанавливает только те места, где найдено управляемое состояние.
 - Повторный запуск обновляет уже известные места и не ломает их состояние.
 
-### Проверка
-Финальные тесты запускаются через Pester:
-
-```powershell
-Invoke-Pester -Path .\tests\final\SkillsUnifier.Final.Tests.ps1 -EnableExit
-```
-
 ### Документация
 - [ARCHITECTURE.md](ARCHITECTURE.md) - принятые архитектурные решения.
 - [ts.md](ts.md) - актуализированное техническое задание.
 - [done.md](done.md) - журнал выполненных работ.
 
-## English version
+</details>
+
+<details>
+<summary>English version</summary>
 
 ### What's included
 - [scripts/SkillsUnifier.psm1](scripts/SkillsUnifier.psm1) - shared install and rollback logic.
@@ -98,50 +87,17 @@ Invoke-Pester -Path .\tests\final\SkillsUnifier.Final.Tests.ps1 -EnableExit
 - [private/](private/) - local wrappers that are not published to GitHub.
 - [tests/final/SkillsUnifier.Final.Tests.ps1](tests/final/SkillsUnifier.Final.Tests.ps1) - final test suite.
 
-### Problem
-Every AI tool keeps its own `skills` path. That leads to:
-
-- manual updates in multiple places;
-- version drift across tools;
-- unclear source of truth;
-- risky rollback.
-
-### Solution
-The project scripts:
-
-- only touch pre-approved locations;
-- preserve the local `skills` folder in `skills-backup`;
-- create a `Junction` to a single source of truth;
-- are safe to run repeatedly;
-- can roll changes back cleanly;
-- fall back to snapshot mode when `skills-backup` already exists.
-
-### Usage
-
-#### Universal install
+### Quick start
 ```powershell
 .\scripts\install-skills.ps1 -SourcePath 'C:\Path\To\skills'
-```
-
-#### Install with a custom location list
-```powershell
-.\scripts\install-skills.ps1 -SourcePath 'C:\Path\To\skills' -KnownLocationsPath 'C:\Path\To\known-locations.psd1'
-```
-
-#### Rollback
-```powershell
 .\scripts\rollback-skills.ps1
+Invoke-Pester -Path .\tests\final\SkillsUnifier.Final.Tests.ps1 -EnableExit
 ```
 
-#### Rollback and remove the backup
-```powershell
-.\scripts\rollback-skills.ps1 -RemoveBackup
-```
-
-#### Local wrapper
-If you need a local wrapper with a hardcoded source path, keep it in `private/` and run it from there.
-
-Both scripts support `-WhatIf` and `-Confirm`.
+### Useful parameters
+- `-KnownLocationsPath` - alternate allowlist of locations.
+- `-RemoveBackup` - delete the backup after rollback.
+- `-WhatIf` and `-Confirm` - supported by both scripts.
 
 ### Supported locations
 The scripts only operate on the allowlist in [config/known-locations.psd1](config/known-locations.psd1):
@@ -161,14 +117,9 @@ The scripts only operate on the allowlist in [config/known-locations.psd1](confi
 - Rollback restores only locations with managed state.
 - Re-running the scripts updates known locations without breaking existing state.
 
-### Validation
-Final tests run through Pester:
-
-```powershell
-Invoke-Pester -Path .\tests\final\SkillsUnifier.Final.Tests.ps1 -EnableExit
-```
-
 ### Documentation
 - [ARCHITECTURE.md](ARCHITECTURE.md) - architecture decisions.
 - [ts.md](ts.md) - updated technical specification.
 - [done.md](done.md) - work log.
+
+</details>
