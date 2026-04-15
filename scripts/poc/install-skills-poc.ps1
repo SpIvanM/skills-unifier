@@ -1,0 +1,12 @@
+[CmdletBinding()]
+param(
+    [Parameter(Mandatory = $true)]
+    [string]$SourcePath,
+    [Parameter(Mandatory = $true)]
+    [string[]]$TargetRoots
+)
+
+$modulePath = Join-Path $PSScriptRoot 'SkillsUnifier.Poc.psm1'
+Import-Module $modulePath -Force
+
+Invoke-SkillsUnifierInstall -SourcePath $SourcePath -TargetRoots $TargetRoots
